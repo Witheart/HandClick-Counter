@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手动计数器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #000000 0%, #ffffff 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+        
+        .counter-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .count-display {
+            font-size: 6rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .count-label {
+            width: 100%;
+            max-width: 400px;
+            margin: 10px 0 20px;
+        }
+        
+        .count-label input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: border 0.3s;
+        }
+        
+        .count-label input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 120px;
+        }
+        
+        .increment {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .increment:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        .decrement {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .decrement:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .reset {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .reset:hover {
+            background-color: #d35400;
+            transform: translateY(-2px);
+        }
+        
+        .save {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .save:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .counters-list {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .counters-list h2 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        
+        #savedCounters {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .saved-counter {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .saved-counter .label {
+            font-weight: bold;
+        }
+        
+        .saved-counter .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .shortcuts {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .shortcuts h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .shortcuts p {
+            margin: 5px 0;
+            color: #7f8c8d;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .count-display {
+                font-size: 4rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+        
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>电脑计数器</h1>
+            <p class="subtitle">简单实用的手动计数工具 - 支持分类保存与快捷键操作</p>
+        </header>
+        
+        <div class="counter-area">
+            <div class="count-label">
+                <input type="text" id="counterLabel" placeholder="输入计数标签（例如：步数、人数、库存...）" maxlength="30">
+            </div>
+            
+            <div class="count-display" id="count">0</div>
+            
+            <div class="button-group">
+                <button class="increment" id="incrementBtn">
+                    <span>+1</span>
+                </button>
+                <button class="decrement" id="decrementBtn">
+                    <span>-1</span>
+                </button>
+                <button class="reset" id="resetBtn">
+                    <span>重置</span>
+                </button>
+                <button class="save" id="saveBtn">
+                    <span>保存</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="shortcuts">
+            <h3>快捷键</h3>
+            <p>空格键 - 计数+1</p>
+            <p>退格键 - 计数-1</p>
+            <p>R键 - 重置计数</p>
+            <p>S键 - 保存计数</p>
+        </div>
+        
+        <div class="counters-list">
+            <h2>已保存的计数器</h2>
+            <div id="savedCounters">
+                <!-- 保存的计数器将显示在这里 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取DOM元素
+            const countDisplay = document.getElementById('count');
+            const incrementBtn = document.getElementById('incrementBtn');
+            const decrementBtn = document.getElementById('decrementBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const counterLabel = document.getElementById('counterLabel');
+            const savedCounters = document.getElementById('savedCounters');
+            
+            // 初始化计数
+            let count = 0;
+            
+            // 从本地存储加载保存的计数器
+            loadSavedCounters();
+            
+            // 增加计数
+            incrementBtn.addEventListener('click', incrementCount);
+            
+            // 减少计数
+            decrementBtn.addEventListener('click', decrementCount);
+            
+            // 重置计数
+            resetBtn.addEventListener('click', resetCount);
+            
+            // 保存计数
+            saveBtn.addEventListener('click', saveCounter);
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', function(e) {
+                // 防止在输入框内触发快捷键
+                if (e.target === counterLabel) return;
+                
+                switch(e.key) {
+                    case ' ':
+                        e.preventDefault();
+                        incrementCount();
+                        break;
+                    case 'Backspace':
+                        e.preventDefault();
+                        decrementCount();
+                        break;
+                    case 'r':
+                    case 'R':
+                        e.preventDefault();
+                        resetCount();
+                        break;
+                    case 's':
+                    case 'S':
+                        e.preventDefault();
+                        saveCounter();
+                        break;
+                }
+            });
+            
+            function incrementCount() {
+                count++;
+                updateDisplay();
+                animateDisplay();
+            }
+            
+            function decrementCount() {
+                if (count > 0) {
+                    count--;
+                    updateDisplay();
+                    animateDisplay();
+                }
+            }
+            
+            function resetCount() {
+                count = 0;
+                updateDisplay();
+                animateDisplay();
+            }
+            
+            function updateDisplay() {
+                countDisplay.textContent = count;
+            }
+            
+            function animateDisplay() {
+                countDisplay.classList.remove('pulse');
+                // 触发重绘
+                void countDisplay.offsetWidth;
+                countDisplay.classList.add('pulse');
+            }
+            
+            function saveCounter() {
+                const label = counterLabel.value.trim() || '未命名计数';
+                
+                // 获取已保存的计数器
+                let counters = JSON.parse(localStorage.getItem('counters')) || [];
+                
+                // 添加新计数器
+                counters.push({
+                    label: label,
+                    value: count,
+                    timestamp: new Date().toLocaleString()
+                });
+                
+                // 保存到本地存储
+                localStorage.setItem('counters', JSON.stringify(counters));
+                
+                // 重新加载显示的计数器
+                loadSavedCounters();
+                
+                // 显示成功消息
+                alert(`"${label}" 已保存，计数值: ${count}`);
+                
+                // 重置当前计数
+                resetCount();
+                counterLabel.value = '';
+            }
+            
+            function loadSavedCounters() {
+                // 清空当前显示
+                savedCounters.innerHTML = '';
+                
+                // 从本地存储获取计数器
+                const counters = JSON.parse(localStorage.getItem('counters')) || [];
+                
+                if (counters.length === 0) {
+                    savedCounters.innerHTML = '<p>暂无保存的计数器</p>';
+                    return;
+                }
+                
+                // 显示计数器（最近保存的在前）
+                counters.reverse().forEach(counter => {
+                    const counterEl = document.createElement('div');
+                    counterEl.className = 'saved-counter';
+                    counterEl.innerHTML = `
+                        <div>
+                            <div class="label">${counter.label}</div>
+                            <div class="timestamp">${counter.timestamp}</div>
+                        </div>
+                        <div class="value">${counter.value}</div>
+                    `;
+                    savedCounters.appendChild(counterEl);
+                });
+            }
+            
+            // 添加清除所有保存的计数器的功能（通过双击重置按钮）
+            let resetClickCount = 0;
+            resetBtn.addEventListener('click', function() {
+                resetClickCount++;
+                
+                if (resetClickCount === 2) {
+                    if (confirm('确定要清除所有已保存的计数器吗？此操作不可撤销。')) {
+                        localStorage.removeItem('counters');
+                        loadSavedCounters();
+                        alert('所有已保存的计数器已清除');
+                    }
+                    resetClickCount = 0;
+                }
+                
+                // 1秒后重置点击计数
+                setTimeout(() => {
+                    resetClickCount = 0;
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
